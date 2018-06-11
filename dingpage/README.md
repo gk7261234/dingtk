@@ -1,4 +1,4 @@
-# example-vue
+# DingPage
 
 > A Vue.js project
 
@@ -26,14 +26,3 @@ npm run e2e
 # run all tests
 npm test
 ```
-
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
-
-服务端API调试:
-https://debug.dingtalk.com/?spm=a219a.7629140.0.0.VssESO
-
-Kuhn的测试接口 {userId} = 3354
-http://www.q-mobile.com/query/{userId}
-
-Q系统接口Api:
-https://www.showdoc.cc/web/#/qmobile?page_id=423377679375033

@@ -102,7 +102,6 @@ export default {
     try {
       let ReviewDetail = await this.$http.get('/apiQ/project/review/details/' + _this.id)
       _this.detail = ReviewDetail.data[0]
-      console.log(ReviewDetail.data[0])
     } catch (e) {}
   },
   methods: {

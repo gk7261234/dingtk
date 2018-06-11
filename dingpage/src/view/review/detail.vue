@@ -100,16 +100,16 @@ export default {
   mounted: async function () {
     var _this = this
     try {
-      let reviewDetail = await this.$http.get('/apiQ/project/review/details/' + _this.id)
-      _this.detail = reviewDetail.data[0]
-      console.log(reviewDetail.data[0])
+      let ReviewDetail = await this.$http.get('/apiQ/project/review/details/' + _this.id)
+      _this.detail = ReviewDetail.data[0]
+      console.log(ReviewDetail.data[0])
     } catch (e) {}
   },
   methods: {
     reviewSubmit: async function () {
       var _this = this
       try {
-        let reviewSubmit = await this.$http.post('/apiQ/project/review/submit', {
+        let ReviewSubmit = await this.$http.post('/apiQ/project/review/submit', {
           id: _this.id
         })
         _this.toastSubmit = true
@@ -123,7 +123,7 @@ export default {
     reviewRollback: async function () {
       var _this = this
       try {
-        let reviewRollback = await this.$http.post('/apiQ/project/review/rollback', {
+        let ReviewRollback = await this.$http.post('/apiQ/project/review/rollback', {
           id: _this.id
         })
         _this.toastReturn = true

@@ -1,0 +1,22 @@
+@import 'variable';
+
+#app {
+  .btn__box {
+    z-index: 20;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    padding: 6px 12px;
+    width: 100%;
+    background-color: white;
+  }
+
+  .btn {
+    border-radius: 3px;
+    &.btn_primary {
+      line-height: 44px;
+      font-size: $s17;
+      background-color: $c2;
+    }
+  }
+}

@@ -1,0 +1,51 @@
+@import './variable';
+@import './title';
+
+.review-list__item {
+  padding: 9px $page-spacing 9px 0;
+  border-bottom: solid 0.5px $c5;
+  background-color: white;
+}
+
+.avatar {
+  padding-right: $page-spacing;
+}
+
+.review-list__card {
+  width: 100%;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.review__text {
+  line-height: 20px;
+  font-size: $s14;
+  color: $c6-2;
+}
+
+.list__header {
+  float: left;
+  margin-bottom: 6px;
+  width: 100%;
+  clear: both;
+}
+
+.review-list__title {
+  @extend .list__title;
+  float: left;
+}
+
+.review-list__time {
+  display: block;
+  vertical-align: top;
+  float: right;
+  line-height: 1;
+  text-align: right;
+  font-size: $s12;
+  color: $c6-2;
+}
+
+.review__statu {
+  font-size: $s14;
+  color: $c11-3;
+}

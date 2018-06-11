@@ -1,0 +1,12 @@
+@import 'variable';
+
+.review__info {
+  color: $c6-2;
+  background: white;
+  .weui-cells {
+    font-size: $s12;
+  }
+  .weui-cell__ft {
+    color: $c6-1;
+  }
+}

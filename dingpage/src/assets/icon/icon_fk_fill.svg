@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200px" height="200px" viewBox="0 0 200 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49 (51002) - http://www.bohemiancoding.com/sketch -->
+    <title>Artboard 2</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="0%" y1="0%" x2="100%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#FA709A" offset="0%"></stop>
+            <stop stop-color="#FEE140" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="Artboard-2" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="放款">
+            <rect id="Rectangle-9" fill="url(#linearGradient-1)" x="0" y="0" width="200" height="200"></rect>
+            <g transform="translate(65.000000, 35.000000)" fill="#FFFFFF" fill-rule="nonzero" id="Shape">
+                <path d="M70.1753183,46.2934047 C69.097551,44.465793 67.1429559,43.3509498 65.0239556,43.3509499 L46.6836431,43.3509499 L67.9284474,9.13805857 C69.0792838,7.29217078 69.1340855,4.97110384 68.0745853,3.07038774 C67.0150851,1.16967152 65.0239556,0 62.8501537,0 L17.9492689,0 C15.0630444,0 12.5969665,2.04692516 12.0672164,4.87972333 L0.102171874,68.4806109 C-0.226638485,70.2351182 0.248309826,72.0444538 1.38087898,73.4151625 C2.51344814,74.7858713 4.21230175,75.5900205 5.9842244,75.5900205 L23.0275627,75.5900205 L17.3099153,124.314149 C16.981105,127.165223 18.6982258,129.833536 21.4200452,130.71079 C24.1418645,131.588043 27.101158,130.418372 28.4894684,127.896268 L70.2483873,52.2331428 C71.2713529,50.387255 71.2530857,48.1210165 70.1753183,46.2934047 Z"></path>
+            </g>
+        </g>
+    </g>
+</svg>

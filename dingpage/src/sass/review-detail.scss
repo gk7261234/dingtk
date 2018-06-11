@@ -1,0 +1,75 @@
+@import 'variable';
+@import 'button';
+
+html {
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+*,
+*:after,
+*:before {
+  box-sizing: inherit;
+}
+
+.popup0 {
+  padding-bottom:15px;
+  height:200px;
+}
+
+.popup1 {
+  width:100%;
+  height:100%;
+}
+
+.review-detail {
+  // padding-left: $page-spacing;
+  // float: left;
+  width: 100%;
+}
+
+.review-operator {
+  clear: both;
+  padding: 8px $page-spacing;
+  background: white;
+  width: 100%;
+  border-bottom: solid .5px $c5;
+  box-sizing: border-box;
+  &:before, &:after {
+    display: block;
+    content: '';
+    clear: both;
+  }
+}
+
+.avatar {
+  float: left;
+  margin-right: $page-spacing;
+}
+
+.operator__name {
+  float: left;
+  display: inline-block;
+  vertical-align: top;
+  min-width: 80%;
+  line-height: 1;
+  font-size: $s17;
+  color: $c6-1;
+}
+.review__statu {
+  float: left;
+  display: inline-block;
+  vertical-align: top;
+  margin-top: 7px;
+  min-width: 80%;
+  line-height: 1;
+  font-size: $s13;
+  color: $c11-3;
+}
+
+.review__info {
+  // float: left;
+  clear: both;
+  padding-left: $page-spacing;
+  width: 100%;
+}

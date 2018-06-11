@@ -1,0 +1,12 @@
+/.idea
+
+/backend/logs/*
+
+# Mac DS_Store Files
+.DS_Store
+
+/backend/vendor
+
+/dingpage/__MACOSX
+
+/dingpage/node_modules/

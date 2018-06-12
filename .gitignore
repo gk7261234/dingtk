@@ -19,3 +19,7 @@ package-lock.json
 *.ntvs*
 *.njsproj
 *.sln
+
+/__MACOSX
+
+/vendor

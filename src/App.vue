@@ -33,9 +33,6 @@
         name: ''
       }
     },
-    created: async function () {
-
-    },
     mounted: async function () {
       var _this = this
       function getJsApiSingnature (jsapiTicket, noncestr, timestamp, url) {
@@ -111,6 +108,9 @@
             corpId: corpid,
             onSuccess: function (data) {
               _this.name = data.nickName
+              if(data.nickName !== '王泽惠') {
+                alert('不是王泽惠')
+              }
             },
             onFail: function (err) {
               alert('userGet fail: ' + JSON.stringify(err))

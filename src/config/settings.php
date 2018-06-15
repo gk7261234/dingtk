@@ -18,6 +18,17 @@ return [
             'error'=> \Monolog\Logger::ERROR,
         ],
     ],
+    //钉钉
+    'ddTalk'=>[
+        'agentId' => '171995680',
+        'corpid' => 'ding2c238b123d0f70fe',
+        'corpsecret' => 'WSglHDjrPbTAaEEImMNOZnLYsMTFTqhFHGtOjNp7Rkj2igv5plK51OJ1mW2DfXul',
+        'singnatureUrl' => 'http://192.168.1.56:8080/',
+        'singnatureNoncestr' => 'jR93Gk5jc0mFgf76',
+        'token_url' => 'https://oapi.dingtalk.com/gettoken',
+        'ticket_url' => 'https://oapi.dingtalk.com/get_jsapi_ticket',
+        'user_info_url' => 'https://oapi.dingtalk.com/user/getuserinfo',
+    ],
     //数据库配置
     'dbSetting' => [
         'host' => '192.168.1.22',

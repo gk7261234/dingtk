@@ -3,133 +3,74 @@
 use Slim\Http\Request;
 use Slim\Http\Response;
 
-require __DIR__ . '/../validate/register.php';
-require __DIR__ . '/../components/middleware.php';
-require __DIR__ . '/../middleware/project/FProjectRequest.php';
+//钉钉鉴权信息
+$app->get('/dAuth',function (Request $request, Response $response, $args){
+    try{
+        $token_url = $this->get('ddTalk')['token_url'];
 
-$container = $app->getContainer();
-
-//测试 csrf
-$app->get('/q/test',function ($request, $response, $args) {
-    $nameKey = $this->csrf->getTokenNameKey();
-    $valueKey = $this->csrf->getTokenValueKey();
-    $name = $request->getAttribute($nameKey);
-    $value = $request->getAttribute($valueKey);
-
-    $tokenArray = [
-        $nameKey => $name,
-        $valueKey => $value
-    ];
-    $this->logger->info($tokenArray);
-//     $response->write(json_encode($tokenArray));
-    return $this->renderer->render($response, 'index.phtml', $tokenArray);
-})->add($container->get('csrf'));
-
-$app->post('/q/test',function ($req, $res, $args){
-    $this->logger->info($req->getAttribute('csrf_status'));
-})->add($container->get('csrf'));
+        $corpid = $this->get('ddTalk')['corpid'];
+        $corpsecret = $this->get('ddTalk')['corpsecret'];
+        $singnatureTimestamp = time();
+        $singnatureNoncestr = $this->get('ddTalk')['singnatureNoncestr'];
+        $url = $this->get('ddTalk')['singnatureUrl'];
+        $agentId = $this->get('ddTalk')['agentId'];
 
 
+        $this->logger->info($singnatureTimestamp);
+        $this->logger->info($url);
 
-// 用户查询
-$app->get('/q/query/{userId}', function (Request $request, Response $response, array $args) use($app) {
-    try {
-        $db = new db();
-        //test 查询
-        $this->logger->info($args['userId']);
-//        $query = $db->queryAllValue("select id,login_name,`name` from users WHERE  id = :id", [":id" => $args['userId']]);
-//        $query = $db->findOne('users', $args['userId']);  
-        $query = $db->querySingleSqlValue('users',$args['userId'],'name');
-        $this->logger->info($request->getBody()->auditStatus);
-        $this->logger->info($query);
-        if ($query) {
-            $response = $response->withStatus(200)->withHeader('Content-type', 'application/json');
-            $response->getBody()->write(json_encode(
-                [
-                    'status' => 200,
-                    'error' => '',
-                    'data' => $query
-                ]
-            ));
-        } else {
-            $response = $response->withStatus(404)->withHeader('Content-type', 'application/json');
-            $response->getBody()->write(json_encode(
-                [
-                    'status' => 404,
-                    'error' => '',
-                    'data' => $query
-                ]
-            ));
-        }
-        return $response;
-//        return $response->withJson($query);
-    } catch (PDOException $e) {
-        $response = $response->withStatus(500)->withHeader('Content-type', 'application/json');
-        $response->getBody()->write(json_encode(
-            [
-                'status' => 500,
-                'error' => $e->getMessage(),
-                'data' => ''
-            ]
-        ));
-        return $response;
-    }
-})->add($audit);
-
-
-//注册
-
-$app->post('/q/register', function (Request $request, Response $response, array $args) {
-    try {
-        $db = new db();
-        $validate = new Register();
-        $params = $request->getParsedBody();
-        //验证数据
-        $validate_result = $validate->validate($params);
-        if (!is_bool($validate_result)) {
-            $response = $response->withStatus(404)->withHeader('Content-type', 'application/json');
-            $response->getBody()->write(json_encode(
-                [
-                    'status' => 404,
-                    'error' => $validate_result,
-                    'result' => 'N'
-                ]
-            ));
-        } else {
-            $insert = $db->insert('user', ["name" => ":name", "login_name" => ":login_name", "password" => ":password"], [":name" => $params['name'], ":login_name" => $params['mp_no'], ":password" => $params['psd']]);
-            $this->logger->info($insert);
-            if ($insert === true) {
+        //获取token
+        $get_token = $this->client->request('get',$token_url.'?corpid='.$corpid.'&corpsecret='.$corpsecret)->getBody();
+        $get_token = json_decode((string) $get_token, true);
+        $this->logger->info($get_token);
+        if ($get_token['errcode'] == '0'){
+            $ticket_url = $this->get('ddTalk')['ticket_url'];
+            //获取ticket
+            $get_ticket = $this->client->request('get',$ticket_url.'?access_token='.$get_token['access_token'])->getBody();
+            $get_ticket = json_decode((string) $get_ticket, true);
+            $this->logger->info($get_ticket);
+            if ($get_token['errcode'] != '0'){
+                $response = $response->withStatus(500)->withHeader('Content-type', 'application/json');
+                $response->getBody()->write(json_encode(
+                    [
+                        'error'=>$get_ticket['errmsg']
+                    ]
+                ));
+            }else{
+                $str = 'jsapi_ticket='.$get_ticket['ticket'].'&noncestr='.$singnatureNoncestr.'&timestamp='.$singnatureTimestamp.'&url='.$url;
+                $signature = sha1($str);
+                $this->logger->info($str);
                 $response = $response->withStatus(200)->withHeader('Content-type', 'application/json');
                 $response->getBody()->write(json_encode(
                     [
-                        'status' => 200,
-                        'error' => '',
-                        'result' => 'Y'
-                    ]
-                ));
-            } else {
-                $response = $response->withStatus(404)->withHeader('Content-type', 'application/json');
-                $response->getBody()->write(json_encode(
-                    [
-                        'status' => 404,
-                        'error' => $insert,
-                        'result' => 'N'
+                        'signature'=>$signature,
+                        'nonceStr'=>$singnatureNoncestr,
+                        'timeStamp'=>$singnatureTimestamp,
+                        'agentId'=>$agentId,
+                        'corpId'=>$corpid,
                     ]
                 ));
             }
+        }else{
+            $response = $response->withStatus(500)->withHeader('Content-type', 'application/json');
+            $response->getBody()->write(json_encode(
+                [
+                    'error'=>$get_token['errmsg']
+                ]
+            ));
         }
-
-    } catch (PDOException $e) {
+    }catch (\Exception $e){
         $response = $response->withStatus(500)->withHeader('Content-type', 'application/json');
         $response->getBody()->write(json_encode(
             [
-                'status' => 500,
-                'error' => $e->getMessage(),
-                'result' => 'N'
+                'error' => $e->getMessage()
             ]
         ));
-        return $response;
-    }
-
+    };
 });
+
+//验证用户信息
+//$app->post('/authUser',function (){
+//
+//});
 

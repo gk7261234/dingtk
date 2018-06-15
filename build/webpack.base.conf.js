@@ -12,7 +12,7 @@ function resolve (dir) {
 let webpackConfig = {
   context: path.resolve(__dirname, '../'),
   entry: {
-    app: './src/main.js'
+    app: './mobile/view/main.js'
   },
   output: {
     path: config.build.assetsRoot,
@@ -48,7 +48,12 @@ let webpackConfig = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        include: [resolve('src'), resolve('test')]
+        include: [
+          resolve('src'),
+          resolve('test'),
+          resolve('mobile/view/router/router.js'),
+          resolve('mobile/view/main.js'),
+        ]
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,

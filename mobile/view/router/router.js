@@ -1,10 +1,10 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import AppMenu from '../components/app-menu'
-import ReviewList from '../view/review/list'
-import ReviewDetail from '../view/review/detail'
-import ReviewInfoBasic from '../view/review/info/basic'
-import ReviewInfoRepayment from '../view/review/info/repayment'
+import ReviewList from '../page/review/list'
+import ReviewDetail from '../page/review/detail'
+import ReviewInfoBasic from '../page/review/info/basic'
+import ReviewInfoRepayment from '../page/review/info/repayment'
 
 Vue.use(VueRouter)
 

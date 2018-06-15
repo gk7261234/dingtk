@@ -113,7 +113,7 @@ export default {
         })
         _this.toastSubmit = true
         setTimeout(function () {
-          this.$router.push('/review-list/')
+          this.$router.push('/review/list/')
         }, 1300)
       } catch (e) {
         console.log(e)
@@ -127,7 +127,7 @@ export default {
         })
         _this.toastReturn = true
         setTimeout(function () {
-          this.$router.push('/review-list/')
+          this.$router.push('/review/list/')
         }, 1300)
       } catch (e) {
         console.log(e)

@@ -37,9 +37,6 @@ class db
      */
     public function connect()
     {
-        $this->logInfo("111111");
-        $this->logInfo($this->dbhost);
-        $this->logInfo($this->dbh);
         $mysql_connect_str = "mysql:host=$this->dbhost;dbname=$this->dbname";
         $setting = [
             PDO::ATTR_PERSISTENT => true,   //是否持久链接
@@ -49,8 +46,6 @@ class db
         if (!isset($this->dbh)) {
             $this->dbh = new PDO($mysql_connect_str, $this->dbuser, $this->dbpass, $setting);
         }
-
-        $this->logInfo(isset($this->dbh));
         return $this->dbh;
     }
 

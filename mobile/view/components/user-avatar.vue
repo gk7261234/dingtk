@@ -9,7 +9,7 @@
     name: 'Avatar',
     data () {
       return {
-        imgUrl: './src/assets/img/avatar.png'
+        imgUrl: './mobile/view/assets/img/avatar.png'
       }
     },
     mounted: function () {

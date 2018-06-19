@@ -28,6 +28,13 @@ return [
         'token_url' => 'https://oapi.dingtalk.com/gettoken',
         'ticket_url' => 'https://oapi.dingtalk.com/get_jsapi_ticket',
         'user_info_url' => 'https://oapi.dingtalk.com/user/getuserinfo',
+        'permitUser' => [
+            "郑熹",
+            "郑达希",
+            "王泽惠",
+            "郭奎",
+            "冯武泰"
+        ]
     ],
     //数据库配置
     'dbSetting' => [

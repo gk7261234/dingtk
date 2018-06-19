@@ -6,6 +6,7 @@ use Slim\Http\Response;
 require __DIR__ . '/../../service/FProjectRequestService.php';
 require __DIR__ . '/../../service/ProjectService.php';
 require __DIR__ . '/../../middleware/project/FProjectRequest.php';
+require __DIR__ . '/../../components/middleware.php';
 
 $app->group('/project/review', function () {
     // 项目复核列表
@@ -203,5 +204,5 @@ $app->group('/project/review', function () {
         }
     });
 
-});
+})->add($authUser);
 

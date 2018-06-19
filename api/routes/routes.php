@@ -15,10 +15,6 @@ $app->get('/dAuth',function (Request $request, Response $response, $args){
         $url = $this->get('ddTalk')['singnatureUrl'];
         $agentId = $this->get('ddTalk')['agentId'];
 
-
-        $this->logger->info($singnatureTimestamp);
-        $this->logger->info($url);
-
         //获取token
         $get_token = $this->client->request('get',$token_url.'?corpid='.$corpid.'&corpsecret='.$corpsecret)->getBody();
         $get_token = json_decode((string) $get_token, true);
@@ -70,7 +66,26 @@ $app->get('/dAuth',function (Request $request, Response $response, $args){
 });
 
 //验证用户信息
-//$app->post('/authUser',function (){
-//
-//});
+$app->post('/authUser',function (Request $req, Response $response, array $arg){
+    $userName = $req->getParam('userName');
+    $this->logger->info($userName);
+    $this->logger->info($_SESSION['userName']);
+    if (in_array($userName,$this->get('ddTalk')['permitUser'])){
+        $_SESSION['userName'] = $userName;
+        $response = $response->withStatus(200)->withHeader('Content-type', 'application/json');
+        $response->getBody()->write(json_encode(
+            [
+                'result'=>'Y'
+            ]
+        ));
+    }else{
+        $response = $response->withStatus(500)->withHeader('Content-type', 'application/json');
+        $response->getBody()->write(json_encode(
+            [
+                'result'=>'N'
+            ]
+        ));
+    }
+    
+});
 

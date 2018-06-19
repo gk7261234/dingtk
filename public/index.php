@@ -23,13 +23,15 @@ require __DIR__ . '/../api/components/db.php';
 // Set up dependencies
 require __DIR__ . '/../api/components/dependencies.php';
 
-// Register middleware
-require __DIR__ . '/../api/components/middleware.php';
-
 // Register routes
 require __DIR__ . '/../api/routes/routes.php';
 
 require __DIR__.'/../api/routes/project/reviewRoutes.php';
+
+// Register middleware
+require __DIR__ . '/../api/components/middleware.php';
+
+
 
 
 

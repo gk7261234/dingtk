@@ -66,10 +66,8 @@ $app->get('/dAuth',function (Request $request, Response $response, $args){
 });
 
 //验证用户信息
-$app->post('/authUser',function (Request $req, Response $response, array $arg){
+$app->post('/dAuthUser',function (Request $req, Response $response, array $arg){
     $userName = $req->getParam('userName');
-    $this->logger->info($userName);
-    $this->logger->info($_SESSION['userName']);
     if (in_array($userName,$this->get('ddTalk')['permitUser'])){
         $_SESSION['userName'] = $userName;
         $response = $response->withStatus(200)->withHeader('Content-type', 'application/json');
@@ -82,7 +80,8 @@ $app->post('/authUser',function (Request $req, Response $response, array $arg){
         $response = $response->withStatus(500)->withHeader('Content-type', 'application/json');
         $response->getBody()->write(json_encode(
             [
-                'result'=>'N'
+                'result'=>'N',
+                'error' => '该用户没有访问权限',
             ]
         ));
     }

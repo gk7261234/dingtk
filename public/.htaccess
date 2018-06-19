@@ -18,4 +18,7 @@
 
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteRule ^ index.php [QSA,L]
+
+  #php_value session.save_path '/sessions'   需调试
+
 </IfModule>

@@ -39,11 +39,10 @@ class FProjectRequestService {
                 'req_id'=>$id,
                 'op_type'=>3,
                 'operator_id'=>19,  //ceo => 19
-                'operator_name'=>'王泽惠',
+                'operator_name'=>$_SESSION['userName'],
                 'memo'=>$memo,
                 'created_at'=>date("Y-m-d H:i:s"),
             ]);
-            $this->logInfo("=========我要下面的结果================================");
             
             if ($l === false){
                 $this->logInfo("third step is false");

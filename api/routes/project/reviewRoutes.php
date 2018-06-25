@@ -158,7 +158,7 @@ $app->group('/project/review', function () {
                     'req_id'=>$fr_id,
                     'op_type'=>2,
                     'operator_id'=>19,  //ceo => 19
-                    'operator_name'=>'王泽惠',
+                    'operator_name'=>$_SESSION['userName'],
                     'memo'=>"钉钉退回",
                     'created_at'=>date("Y-m-d H:i:s"),
                 ]);

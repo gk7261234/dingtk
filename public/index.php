@@ -20,6 +20,13 @@ $app = new \Slim\App($settings);
 //Register db
 require __DIR__ . '/../api/components/db.php';
 
+//service
+require __DIR__ . '/../api/service/FProjectRequestService.php';
+require __DIR__ . '/../api/service/ProjectService.php';
+
+//mailer
+require __DIR__ .'/../api/components/mailer.php';
+
 // Set up dependencies
 require __DIR__ . '/../api/components/dependencies.php';
 

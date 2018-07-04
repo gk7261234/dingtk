@@ -1,5 +1,12 @@
 <?php
 class ProjectService{
+
+    private $app;
+    public function __construct($app)
+    {
+        $this->app = $app;
+    }
+
     private function logInfo ($str) {
         $dataType = gettype($str);
         if($dataType=='array'){
@@ -10,7 +17,7 @@ class ProjectService{
         file_put_contents($file, "[".$time."] [内部打印]:"." dataType ".$dataType." ".$str."\n", FILE_APPEND);
     }
     public function release($id,$f_id){
-        $db = new db();
+        $db = $this->app->db;
         $db->begin();
         try{
             $fproject = $db->findOne('f_projects',$f_id);

@@ -2,6 +2,11 @@
 use GuzzleHttp\Client;
 
 class FProjectRequestService {
+    private $app;
+    public function __construct($app)
+    {
+        $this->app = $app;
+    }
 
     private function logInfo ($str) {
         $dataType = gettype($str);
@@ -14,7 +19,9 @@ class FProjectRequestService {
     }
 
     public function audit($id,$memo='') {
-        $db = new db();
+
+        $this->app->logger->info("这是注入形式的实现");
+        $db = $this->app->db;
         $db->begin();
         try {
             //获取复核项目信息
@@ -23,9 +30,12 @@ class FProjectRequestService {
             $this->logInfo($req['status']);
 
             //验证项目状态 4 ： 待复核
-            if ($req['status'] != 4) {
-                return false;
-            }
+            //注：钉钉审批没有中间状态 需注释掉 两种方式 确定后在处理
+//            if ($req['status'] != 4) {
+//                return false;
+//            }
+
+
             //更新fproj_requests项目状态
             $r = $db->update('fproj_requests',['status'=>10,'updated_at'=>date("Y-m-d H:i:s"),'auditor_id'=>19 ],["id"=>$id]);
             if (!$r){
@@ -39,7 +49,8 @@ class FProjectRequestService {
                 'req_id'=>$id,
                 'op_type'=>3,
                 'operator_id'=>19,  //ceo => 19
-                'operator_name'=>$_SESSION['userName'],
+//                'operator_name'=>$_SESSION['userName'],
+                'operator_name'=>"王泽惠",
                 'memo'=>$memo,
                 'created_at'=>date("Y-m-d H:i:s"),
             ]);

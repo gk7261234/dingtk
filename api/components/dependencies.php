@@ -3,7 +3,7 @@
 
 $container = $app->getContainer();
 
-// view renderer
+// view renderer 暂不用
 $container['renderer'] = function ($c) {
     $settings = $c->get('settings')['renderer'];
     return new Slim\Views\PhpRenderer($settings['template_path']);
@@ -33,7 +33,7 @@ $container['session'] = function ($c) {
     return new \SlimSession\Helper;
 };
 
-//csrf
+//csrf 暂不用
 $container['csrf'] = function ($c) {
     $guard = new \Slim\Csrf\Guard();
     $guard->setFailureCallable(function ($request, $response, $next) {
@@ -50,4 +50,21 @@ $container['db'] = function ($c) {
 
 $container['client'] = function ($c) {
     return new \GuzzleHttp\Client();
+};
+
+//注册fpror
+
+$container['fprService'] = function ($c) {
+    return new FProjectRequestService($c);
+};
+
+$container['pService'] = function ($c) {
+    return new ProjectService($c);
+};
+
+//通用的邮件服务
+$container['mailer'] = function ($c) {
+    $config = $c->get('settings')['mailer']['transport'];
+    $c->logger->info($config);
+    return new Mailer($config['host'],$config['username'],$config['password'],$config['port'],$config['from']);
 };

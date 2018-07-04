@@ -3,8 +3,8 @@
 use Slim\Http\Request;
 use Slim\Http\Response;
 
-require __DIR__ . '/../../service/FProjectRequestService.php';
-require __DIR__ . '/../../service/ProjectService.php';
+//require __DIR__ . '/../../service/FProjectRequestService.php';
+//require __DIR__ . '/../../service/ProjectService.php';
 require __DIR__ . '/../../middleware/project/FProjectRequest.php';
 require __DIR__ . '/../../components/middleware.php';
 
@@ -108,11 +108,11 @@ $app->group('/project/review', function () {
         $memo = "钉钉复核";
 //        $amount = $req->getParam('amount');
         try{
-            $fp_service = new FProjectRequestService();
+            $fp_service = $this->fprService;
             $r = $fp_service->audit($fr_id, $memo); //return f_id or false
             if ($r !== false) {
                 //生成项目 projects
-                $p_service = new ProjectService();
+                $p_service = $this->pService;
                 $r = $p_service->release($fr_id, $r);
             }
             if ($r !== false) {

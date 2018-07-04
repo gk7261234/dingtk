@@ -31,7 +31,6 @@ class db
         $this->dbname = $dbname;
     }
 
-    // Connect
     /**
      * @return PDO
      */
@@ -39,7 +38,7 @@ class db
     {
         $mysql_connect_str = "mysql:host=$this->dbhost;dbname=$this->dbname";
         $setting = [
-            PDO::ATTR_PERSISTENT => true,   //是否持久链接
+            PDO::ATTR_PERSISTENT => true,
             PDO::MYSQL_ATTR_INIT_COMMAND => "set names utf8",  //交互数据未utf8格式
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
         ];

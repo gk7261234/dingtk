@@ -17,6 +17,17 @@ return [
             'level' => \Monolog\Logger::DEBUG,
             'error'=> \Monolog\Logger::ERROR,
         ],
+
+        //mailer
+        'mailer' => [
+            'transport' => [
+                'host' => 'smtp.vc265.com',
+                'username' => 'guokui@vc265.com',
+                'password' => '!234qwer',
+                'port' => '25',
+                'from' => ['guokui@vc265.com'=>'vc265'],
+            ]
+        ] ,
     ],
     //钉钉
     'ddTalk'=>[

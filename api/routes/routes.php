@@ -3,6 +3,10 @@
 use Slim\Http\Request;
 use Slim\Http\Response;
 
+//require __DIR__ . '/../service/FProjectRequestService.php';
+//require __DIR__ . '/../service/ProjectService.php';
+//require_once ("lib/swift_required.php");
+
 //钉钉鉴权信息
 $app->get('/dAuth',function (Request $request, Response $response, $args){
     try{
@@ -88,3 +92,38 @@ $app->post('/dAuthUser',function (Request $req, Response $response, array $arg){
     
 });
 
+//钉钉审批回调  service 需传入$app实例
+$app->post('/dAuthCallBack',function (Request $req, Response $response, array $arg){
+    $dBody = $req->getParsedBody();
+    $this->logger->info($dBody);
+    if ($dBody['type'] == 'finish' && $dBody['result'] == 'agree'){
+        $result = $this->db->queryAllValue("SELECT id FROM fproj_requests WHERE process_code = :process_code",[":process_code"=>$dBody['processInstanceId']]);
+        if($result == []){
+            $this->logger->info("查询不到相关审批订单，发个消息通知一下");
+            return;
+        }
+        $id = $result[0]['id'];
+        $memo = "钉钉审核";
+        $this->logger->info($id);
+        try{
+            $fp_service = $this->fprService;
+            $r = $fp_service->audit($id, $memo); //return f_id or false
+            if ($r !== false) {
+                //生成项目 projects
+                $p_service = $this->pService;
+                $r = $p_service->release($id, $r);
+            }
+            if ($r !== false) {
+                $this->mailer->send(['1011464909@qq.com'=>'kuhn'],'钉钉审核','审核已通过');
+            } else {
+                $this->mailer->send(['1011464909@qq.com'=>'kuhn'],'钉钉审核','审核失败，项目处理中出错，请及时人工干预');
+            }
+        }catch (Exception $e){
+            $this->logger->info($e->getMessage());
+            $this->mailer->send(['1011464909@qq.com'=>'kuhn'],'钉钉审核','内部错误 500 ');
+        }
+    }else{
+        //有待商酌 审核中间人审批
+        $this->logger->info("可能是审核中间人审批哦！");
+    }
+});

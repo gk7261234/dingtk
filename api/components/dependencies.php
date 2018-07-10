@@ -65,6 +65,5 @@ $container['pService'] = function ($c) {
 //通用的邮件服务
 $container['mailer'] = function ($c) {
     $config = $c->get('settings')['mailer']['transport'];
-    $c->logger->info($config);
     return new Mailer($config['host'],$config['username'],$config['password'],$config['port'],$config['from']);
 };

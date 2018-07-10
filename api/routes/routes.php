@@ -94,26 +94,31 @@ $app->post('/dAuthUser',function (Request $req, Response $response, array $arg){
 
 //钉钉审批回调  service 需传入$app实例
 $app->post('/dAuthCallBack',function (Request $req, Response $response, array $arg){
+
     $dBody = $req->getParsedBody();
+
     $this->logger->info($dBody);
-    if ($dBody['type'] == 'finish' && $dBody['result'] == 'agree'){
-        $result = $this->db->queryAllValue("SELECT id FROM fproj_requests WHERE process_code = :process_code",[":process_code"=>$dBody['processInstanceId']]);
-        if($result == []){
-            $this->logger->info("查询不到相关审批订单，发个消息通知一下");
-            return;
-        }
-        $id = $result[0]['id'];
-        $memo = "钉钉审核";
-        $this->logger->info($id);
+    $this->logger->info($this->get('ddAuditPerson')[$dBody['staffId']]);
+
+    $result = $this->db->queryAllValue("SELECT id,status FROM fproj_requests WHERE process_code = :process_code",[":process_code"=>$dBody['processInstanceId']]);
+
+    if( $result == [] &&  strpos($dBody['title'],"项目审批") === false  ){
+        $this->logger->info("其他审批。。。");
+        return;
+    }
+
+    $fp_service = $this->fprService;
+    $id = $result[0]['id'];
+    
+    if ( $dBody['type'] == 'finish' && $dBody['result'] == 'agree' ){
         try{
-            $fp_service = $this->fprService;
-            $r = $fp_service->audit($id, $memo); //return f_id or false
-            if ($r !== false) {
+            $r = $fp_service->audit($id); //return f_id or false
+            if ( $r !== false ) {
                 //生成项目 projects
                 $p_service = $this->pService;
                 $r = $p_service->release($id, $r);
             }
-            if ($r !== false) {
+            if ( $r !== false ) {
                 $this->mailer->send(['1011464909@qq.com'=>'kuhn'],'钉钉审核','审核已通过');
             } else {
                 $this->mailer->send(['1011464909@qq.com'=>'kuhn'],'钉钉审核','审核失败，项目处理中出错，请及时人工干预');
@@ -122,8 +127,19 @@ $app->post('/dAuthCallBack',function (Request $req, Response $response, array $a
             $this->logger->info($e->getMessage());
             $this->mailer->send(['1011464909@qq.com'=>'kuhn'],'钉钉审核','内部错误 500 ');
         }
-    }else{
-        //有待商酌 审核中间人审批
-        $this->logger->info("可能是审核中间人审批哦！");
+    }else if ( $dBody['type'] == 'finish' && $dBody['result'] == 'refuse' ){
+        $fp_service->rollBack($id,$dBody['processInstanceId'],$dBody['staffId'],$dBody['remark']);
+        $this->mailer->send(['1011464909@qq.com'=>'kuhn'],'钉钉审核','审核已拒绝');
+    } else if ( $dBody['type'] == 'finish' && $dBody['event'] == 'task_change' && $dBody['remark'] != null ) {
+        // 中间人审批 需用指定固定用户id区别
+        if ($dBody['staffId'] == '03344943296605'){
+            $status = $result[0]['status'];
+            $this->logger->info($status);
+            if ( $status == '1' ){
+                $fp_service->review($id,$dBody['processInstanceId'],$dBody['staffId'],$dBody['remark']);
+            }else{
+                $this->mailer->send(['1011464909@qq.com'=>'kuhn'],'钉钉审核','项目状态不正确');
+            }
+        }
     }
 });

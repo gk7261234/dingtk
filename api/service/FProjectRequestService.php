@@ -18,16 +18,12 @@ class FProjectRequestService {
         file_put_contents($file, "[".$time."] [内部打印]:"." dataType ".$dataType." ".$str."\n", FILE_APPEND);
     }
 
-    public function audit($id,$memo='') {
-
-        $this->app->logger->info("这是注入形式的实现");
+    public function audit($id) {
         $db = $this->app->db;
         $db->begin();
         try {
             //获取复核项目信息
             $req = $db->findOne("fproj_requests",$id);
-            $this->logInfo("first step is ok");
-            $this->logInfo($req['status']);
 
             //验证项目状态 4 ： 待复核
             //注：钉钉审批没有中间状态 需注释掉 两种方式 确定后在处理
@@ -35,15 +31,13 @@ class FProjectRequestService {
 //                return false;
 //            }
 
-
             //更新fproj_requests项目状态
             $r = $db->update('fproj_requests',['status'=>10,'updated_at'=>date("Y-m-d H:i:s"),'auditor_id'=>19 ],["id"=>$id]);
             if (!$r){
-                $this->logInfo("second step is false");
                 $db->rollback();
                 return false;
             }
-            $this->logInfo("second step is ok");
+
             //添加操作记录
             $l = $db->insert('fproj_requests_logs',[
                 'req_id'=>$id,
@@ -51,54 +45,42 @@ class FProjectRequestService {
                 'operator_id'=>19,  //ceo => 19
 //                'operator_name'=>$_SESSION['userName'],
                 'operator_name'=>"王泽惠",
-                'memo'=>$memo,
+                'memo'=>"钉钉审核",
                 'created_at'=>date("Y-m-d H:i:s"),
             ]);
             
             if ($l === false){
-                $this->logInfo("third step is false");
                 $db->rollback();
                 return false;
             }
-            $this->logInfo("third step is ok");
             $req['pro_type'] = 10;
             $req['industry'] = 100;
+            $req['status'] = 10;
             //添加原始项目  返回该条目的id
             $f_id = $db->insert('f_projects',$req);
             $this->logInfo($f_id);
             if ($f_id === false){
-                $this->logInfo("four step is false");
                 $db->rollback();
                 return false;
             }
-            $this->logInfo("four step is ok");
+
             //复核后添加 f_project_id
             $p = $db->update('fproj_requests',['f_project_id'=>$f_id],["id"=>$id]);
             if(!$p){
-                $this->logInfo("five step is false");
                 $db->rollback();
                 return false;
             }
-            $this->logInfo("five step is ok");
-            //拆分到others表中
-//            $o = $this->saveOtherInfo($req,$f_id);
-
-            $this->logInfo($req['user_id']);
 
             $login_name = $db->querySingleSqlValue('users',$req['user_id'],'login_name');
-            $this->logInfo("other info");
             $req['f_project_id'] = $f_id;
             $req['name'] = $req['user_name'];
             $req['login_name'] = $login_name;
-            $this->logInfo($req);
+            //拆分到others表中
             $o = $db->insert('project_other_info',$req);
-            $this->logInfo($o);
             if ($o === false){
-                $this->logInfo("six step is false");
                 $db->rollback();
                 return false;
             }
-            $this->logInfo("six step is ok");
             //添加项目图片 以原始项目id为父级目录
             $client = new Client();
             if ($req['p_img']){
@@ -107,7 +89,6 @@ class FProjectRequestService {
                     foreach ($pArr as $img){
                         $p_img = $db->insert('f_project_contract_imgs',['f_project_id'=>(int)$f_id,'img'=>$img,'img_type'=>1]);
                         if ($p_img>0){
-                            $this->logInfo("添加项目图片ok");
                             $response = $client->request('post','http://www.q2018.com/projects/fproject/fprojrequest/project_img_handle',[
                                 'form_params' => [
                                     'f_id' => $f_id,
@@ -116,7 +97,6 @@ class FProjectRequestService {
                             ]);
                             $this->logInfo($response->getHeaders());
                         }else{
-                            $this->logInfo("添加项目图片false");
                             return false;
                         }
                     }
@@ -158,4 +138,65 @@ class FProjectRequestService {
             return false;
         }
     }
+
+    public function rollBack($id,$processInstanceId,$staffId,$remark){
+        $db = $this->app->db;
+        $db->begin();
+        try{
+            $r = $db->update('fproj_requests',['status'=>2,'updated_at'=>date("Y-m-d H:i:s"),'auditor_id'=>19 ],["process_code"=>$processInstanceId]);
+            $this->app->logger->info($r);
+            $l = $db->insert('fproj_requests_logs',[
+                'req_id'=>$id,
+                'op_type'=>2,
+                'operator_id'=>2,  //审批人暂未确定
+                'operator_name'=>$staffId,   //钉钉员工唯一标识
+                'memo'=>"钉钉审批拒绝",
+                'created_at'=>date("Y-m-d H:i:s"),
+            ]);
+            if ($l){
+                $db->commit();
+                return true;
+            }else{
+                $db->rollback();
+                return false;
+            }
+        }catch(PDOException $e){
+            $db->rollback();
+            $this->logInfo($e->getMessage());
+            return false;
+        }
+
+    }
+
+    public function review($id,$processInstanceId,$staffId,$remark){
+        $db = $this->app->db;
+        $db->begin();
+        try{
+            $r = $db->update('fproj_requests',['status'=>4,'updated_at'=>date("Y-m-d H:i:s"),'auditor_id'=>19 ],["process_code"=>$processInstanceId]);
+            if (!$r){
+                $this->app->mailer->send(['1011464909@qq.com'=>'kuhn'],'钉钉项目审核 复核','项目更新状态失败');
+            }
+            $l = $db->insert('fproj_requests_logs',[
+                'req_id'=>$id,
+                'op_type'=>4,
+                'operator_id'=>2,  //审批人暂未确定
+                'operator_name'=>$staffId,   //钉钉员工唯一标识
+                'memo'=>"钉钉审批复核=>".$remark,
+                'created_at'=>date("Y-m-d H:i:s"),
+            ]);
+            if ($l){
+                $db->commit();
+                return true;
+            }else{
+                $db->rollback();
+                return false;
+            }
+        }catch(PDOException $e){
+            $db->rollback();
+            $this->logInfo($e->getMessage());
+            return false;
+        }
+    }
+
+
 }

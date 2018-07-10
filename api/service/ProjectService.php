@@ -35,7 +35,7 @@ class ProjectService{
                 "over_rate"=>$fproject['over_fee_rate'],
                 "interest_rate"=>$fproject['fnc_ret'],
                 "debts_months"=>$fproject['deadline'],
-                "f_project_name"=>$fproject['f_project_name'],
+                "f_project_name"=>$fproject['name'],
                 "user_id"=>$fproject['user_id'],
                 "credit_type"=>$fproject['credit_type'],
                 "service_fee_rate"=>$fproject['service_fee_rate'],

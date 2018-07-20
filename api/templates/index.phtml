@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-COMPATIBLE" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>钉钉审核-项目详情</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        /*设置主背景颜色 start*/
+        html {
+            height: 100%;
+            width: 100%;
+            background: #E9ECF1;
+            top: 0;
+            right: 0;
+        }
+        /*设置主背景颜色 end*/
+
+        /*标题 start*/
+        .tittle {
+            /*font-size: 12px;*/
+            margin-top: 3%;
+            margin-left: 3%;
+        }
+        /*标题 start*/
+
+        /*内容展示 start*/
+        .content {
+            background: #fff;
+            width: 100%;
+            margin-top: 1%;
+            border-radius: 2%;
+            padding: 1%;
+        }
+        /*内容展示 end*/
+
+        /*行设置 start*/
+        .row {
+            margin: 5%;
+        }
+        /*行设置 start*/
+
+        /*内容左列 start*/
+        .left {
+            width: 45%;
+            text-align: left;
+            font-weight: bolder;
+            display: inline-block;
+        }
+        /*内容左列 end*/
+
+        /*内容右列 start*/
+        .right {
+            width: 55%;
+            text-align: center;
+        }
+        /*内容右列 end*/
+
+        /*图片展示 start*/
+
+        img {
+            width:auto;
+            height:auto;
+            max-width:100%;
+            max-height:100%;
+        }
+
+        .img-thumbnail {
+            display: block;
+            /*position: relative;*/
+            /*float: left;*/
+            margin: 1%;
+            width: 100px;
+            height: 62px;
+        }
+
+        .delete {
+            display: none;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            opacity:0.5;
+            background-color: #000;
+            width: 180px;
+            height: 20px;
+            color: red;
+            text-align:center;
+        }
+
+        .img-thumbnail:hover > .delete {
+            display: block;
+        }
+        /*图片展示 end*/
+    </style>
+</head>
+<body>
+<div class="tittle">基本信息</div>
+<div class="content">
+    <div class="row">
+        <list class="left">项目名称:</list>
+        <list class="right"><?= htmlspecialchars($result['name']); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">业务品种:</list>
+        <list class="right"><?= htmlspecialchars($result['p_business_variety']); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">年化利率(%):</list>
+        <list class="right"><?= htmlspecialchars($result['fnc_ret']*100); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">授信类型:</list>
+        <list class="right"><?= htmlspecialchars($result['p_credit_type']); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">发生类型:</list>
+        <list class="right"><?= htmlspecialchars($result['p_occurrence_type']); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">融资金额:</list>
+        <list class="right"><?= htmlspecialchars($result['amount']); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">融资期限(月):</list>
+        <list class="right"><?= htmlspecialchars($result['deadline']); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">还本付息方式:</list>
+        <list class="right"><?= htmlspecialchars($result['debts_type']); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">还款期次:</list>
+        <list class="right"><?= htmlspecialchars($result['p_repayment_count']); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">期次间隔(月):</list>
+        <list class="right"><?= htmlspecialchars($result['p_repayment_interval']); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">借款用途:</list>
+        <list class="right"><?= htmlspecialchars($result['p_fnc_use']); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">项目等级:</list>
+        <list class="right"><?= htmlspecialchars($result['p_rank']); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">借款方:</list>
+        <list class="right"><?= htmlspecialchars($result['p_debtor_person']); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">还款方:</list>
+        <list class="right"><?= htmlspecialchars($result['p_repayment_person']); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">经营及财务状况:</list>
+        <list class="right"><?= htmlspecialchars($result['p_funding_operation']); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">项目地区:</list>
+        <list class="right"><?= htmlspecialchars($result['p_city_name']); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">还款保障措施:</list>
+        <list class="right"><?= htmlspecialchars($result['p_repayment_guarantee']); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">财力证明:</list>
+        <list class="right"><?= $result['pre_frozen']==0?"无":"有" ?></list>
+    </div>
+    <?php if ($result['pre_frozen']==1){?>
+        <div class="row">
+            <list class="left">财力证明金额(元):</list>
+            <list class="right"><?= htmlspecialchars($result['amount']*$result['fnc_ret']*$result['deadline']/12); ?></list>
+        </div>
+        <div class="row">
+            <list class="left">财力证明利率(%):</list>
+            <list class="right"><?= htmlspecialchars($result['fnc_ret']*100); ?></list>
+        </div>
+    <?php }?>
+    <div class="row">
+        <list class="left">企业用户:</list>
+        <list class="right"><?= htmlspecialchars($result['user_name']); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">担保措施:</list>
+        <list class="right"><?= htmlspecialchars($result['credit_type']); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">罚息率(%):</list>
+        <list class="right"><?= htmlspecialchars($result['over_fee_rate']*100); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">服务费(元):</list>
+        <list class="right"><?= htmlspecialchars($result['service_fee']); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">起息日:</list>
+        <list class="right">放款日+1</list>
+    </div>
+    <div class="row">
+        <list class="left">到期日:</list>
+        <list class="right">放款日+1</list>
+    </div>
+    <div class="row">
+        <list class="left">业务品种:</list>
+        <list class="right">放款日+1</list>
+    </div>
+    <div class="row">
+        <list class="left">结息日:</list>
+        <list class="right">放款日+1</list>
+    </div>
+    <div class="row">
+        <list class="left">项目推荐人:</list>
+        <list class="right"><?= htmlspecialchars($result['p_project_recommend']); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">项目经办人:</list>
+        <list class="right"><?= htmlspecialchars($result['p_project_operator']); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">还款能力变化:</list>
+        <list class="right"><?= htmlspecialchars($result['p_repayment_capacity_change']); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">逾期情况:</list>
+        <list class="right"><?= htmlspecialchars($result['p_overdue_condition']); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">涉诉情况:</list>
+        <list class="right"><?= htmlspecialchars($result['p_complaint']); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">受行政处罚情况:</list>
+        <list class="right"><?= htmlspecialchars($result['p_administrative_sanction']); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">行业类型:</list>
+        <list class="right"><?= htmlspecialchars($result['p_industry']); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">还款来源:</list>
+        <list class="right"><?= htmlspecialchars($result['ret_source']); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">项目简介:</list>
+        <list class="right"><?= htmlspecialchars($result['p_project_introduction']); ?></list>
+    </div>
+    <div class="row">
+        <list class="left">借款合同编号:</list>
+        <list class="right"><?= htmlspecialchars($result['loan_contract_no']); ?></list>
+    </div>
+</div>
+<div class="tittle">担保信息</div>
+<div class="content">
+    <div class="row">
+        <list class="left">担保信息:</list>
+        <list class="right"><?= $result['c_credit_status']==2?"有":"无" ?></list>
+    </div>
+    <?php if($result['c_credit_status']==2){ ?>
+        <div class="row">
+            <list class="left">自然人担保方:</list>
+            <list class="right"><?= htmlspecialchars($result['c_nature_person']); ?></list>
+        </div>
+        <div class="row">
+            <list class="left">担保方征信报告:</list>
+            <list class="right"><a href="<?= "http://www.q2018.com/webimages/credit_report/".$result['c_credit_report'] ?>">点击查看文件</a></list>
+        </div>
+        <div class="row">
+            <list class="left">保证范围:</list>
+            <list class="right"><?= htmlspecialchars($result['c_guarantee_scope']); ?></list>
+        </div>
+        <div class="row">
+            <list class="left">保证方式:</list>
+            <list class="right"><?= htmlspecialchars($result['c_guarantee_style']); ?></list>
+        </div>
+        <div class="row">
+            <list class="left">保证时间:</list>
+            <list class="right"><?= htmlspecialchars($result['c_guarantee_time']); ?></list>
+        </div>
+        <div class="row">
+            <list class="left">担保协议编号:</list>
+            <list class="right"><?= htmlspecialchars($result['guarantee_contract_no']); ?></list>
+        </div>
+        <div class="row">
+            <list class="left">企业担保方:</list>
+            <list class="right"><?= htmlspecialchars($result['c_credit_person']); ?></list>
+        </div>
+    <?php } ?>
+</div>
+<div class="tittle">项目图片</div>
+<div class="content">
+    <div class="row">
+        <ul class="list">
+            <?php for ($i=0;$i<count($result['p_img']);$i++){ ?>
+                <li class="img-thumbnail">
+                    <a href="<?= "http://www.q2018.com/webimages/project_img/".$result['p_img'][$i] ?>"><img src="<?= "http://www.q2018.com/webimages/project_img/".$result['p_img'][$i] ?>" alt="项目图片"></a>
+                </li>
+            <?php }?>
+        </ul>
+    </div>
+</div>
+<div class="tittle">合同图片</div>
+<div class="content">
+    <div class="row">
+        <ul class="list">
+            <?php for ($i=0;$i<count($result['p_contract_img']);$i++){ ?>
+            <li class="img-thumbnail">
+                <a href="<?= "http://www.q2018.com/webimages/contract_img/".$result['p_contract_img'][$i] ?>"><img src="<?= "http://www.q2018.com/webimages/contract_img/".$result['p_contract_img'][$i] ?>" alt="合同图片"></a>
+            </li>
+            <?php }?>
+        </ul>
+    </div>
+</div>
+<div class="tittle">可能存在的风险</div>
+<div class="content">
+    <div class="row">
+        <ol>
+            <?= $result['risk'] ?>
+        </ol>
+    </div>
+</div>
+<div class="tittle">风险防范措施</div>
+<div class="content">
+    <div class="row">
+        <ol>
+            <?= $result['risk_prevention'] ?>
+        </ol>
+    </div>
+</div>
+</body>
+<script>
+    
+</script>
+</html>

@@ -55,7 +55,7 @@ $app->group('/project/review', function () {
                 }
                 //授信类型
                 $p_credit_type = ['0'=>'普通借款','1'=>'循环授信'];
-                if (isset($query[0]['p_credit_type'])&&!empty($query[0]['p_credit_type'])&&array_key_exists($query[0]['p_credit_type'],$r_i_type)){
+                if (isset($query[0]['p_credit_type'])&&!empty($query[0]['p_credit_type'])&&array_key_exists($query[0]['p_credit_type'],$p_credit_type)){
                     $query[0]['p_credit_type'] = $p_credit_type[$query[0]['p_credit_type']];
                 }else{
                     $query[0]['p_credit_type'] = "其他";
@@ -63,7 +63,7 @@ $app->group('/project/review', function () {
 
                 //发生类型
                 $occurrence_type = ['0'=>'新发生','1'=>'复贷'];
-                if (isset($query[0]['p_occurrence_type'])&&!empty($query[0]['p_occurrence_type'])&&array_key_exists($query[0]['p_occurrence_type'],$r_i_type)){
+                if (isset($query[0]['p_occurrence_type'])&&!empty($query[0]['p_occurrence_type'])&&array_key_exists($query[0]['p_occurrence_type'],$occurrence_type)){
                     $query[0]['p_occurrence_type'] = $occurrence_type[$query[0]['p_occurrence_type']];
                 }else{
                     $query[0]['p_occurrence_type'] = "其他";
@@ -71,7 +71,7 @@ $app->group('/project/review', function () {
 
                 //担保措施
                 $credit_type = ['10'=>'信用担保','11'=>'第三方保证担保','12'=>'质押担保','13'=>'质押担保及第三方保证担保','14'=>'融资性担保公司担保',];
-                if (isset($query[0]['credit_type'])&&!empty($query[0]['credit_type'])&&array_key_exists($query[0]['credit_type'],$r_i_type)){
+                if (isset($query[0]['credit_type'])&&!empty($query[0]['credit_type'])&&array_key_exists($query[0]['credit_type'],$credit_type)){
                     $query[0]['credit_type'] = $credit_type[$query[0]['credit_type']];
                 }else{
                     $query[0]['credit_type'] = "其他";

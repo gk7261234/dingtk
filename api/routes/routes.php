@@ -132,7 +132,7 @@ $app->post('/dAuthCallBack',function (Request $req, Response $response, array $a
         $this->mailer->send(['1011464909@qq.com'=>'kuhn'],'钉钉审核','审核已拒绝');
     } else if ( $dBody['type'] == 'finish' && $dBody['event'] == 'task_change' && $dBody['remark'] != null ) {
         // 中间人审批 需用指定固定用户id区别
-        if ($dBody['staffId'] == '03344943296605'){
+        if ($dBody['staffId'] == '03332210379315'){
             $status = $result[0]['status'];
             $this->logger->info($status);
             if ( $status == '1' ){
@@ -141,5 +141,82 @@ $app->post('/dAuthCallBack',function (Request $req, Response $response, array $a
                 $this->mailer->send(['1011464909@qq.com'=>'kuhn'],'钉钉审核','项目状态不正确');
             }
         }
+    }
+});
+
+
+//钉钉审核详情页
+$app->get('/ddAuth/{id}/details',function (Request $req, Response $response, array $args){
+    try {
+        $query = $this->db->queryAllValue("SELECT *,'fproj_requests' as source FROM fproj_requests where id = :id", [":id" => $args['id']]);
+        $this->logger->info($query);
+        if (gettype($query) == 'array'&&!empty($query)) {
+            $query[0]['status'] = '待复核';
+            //还本付息方式
+            $r_i_type = ['11'=>'按月等本等息','12'=>'按季等本等息','13'=>'每月付息，到期还本','19'=>'一次性收取利息，到期还本','20'=>'一次性还本付息'];
+            if (isset($query[0]['debts_type'])&&!empty($query[0]['debts_type'])&&array_key_exists($query[0]['debts_type'],$r_i_type)){
+                $query[0]['debts_type'] = $r_i_type[$query[0]['debts_type']];
+            }else{
+                $query[0]['debts_type'] = "其他";
+            }
+            //授信类型
+            $p_credit_type = ['0'=>'普通借款','1'=>'循环授信'];
+            if (isset($query[0]['p_credit_type'])&&array_key_exists($query[0]['p_credit_type'],$p_credit_type)){
+                $query[0]['p_credit_type'] = $p_credit_type[$query[0]['p_credit_type']];
+            }else{
+                $query[0]['p_credit_type'] = "其他";
+            }
+
+            //发生类型
+            $occurrence_type = ['0'=>'新发生','1'=>'复贷'];
+            if (isset($query[0]['p_occurrence_type'])&&array_key_exists($query[0]['p_occurrence_type'],$occurrence_type)){
+                $query[0]['p_occurrence_type'] = $occurrence_type[$query[0]['p_occurrence_type']];
+            }else{
+                $query[0]['p_occurrence_type'] = "其他";
+            }
+
+            //担保措施
+            $credit_type = ['10'=>'信用担保','11'=>'第三方保证担保','12'=>'质押担保','13'=>'质押担保及第三方保证担保','14'=>'融资性担保公司担保',];
+            if (isset($query[0]['credit_type'])&&!empty($query[0]['credit_type'])&&array_key_exists($query[0]['credit_type'],$credit_type)){
+                $query[0]['credit_type'] = $credit_type[$query[0]['credit_type']];
+            }else{
+                $query[0]['credit_type'] = "其他";
+            }
+
+            //企业担保方
+            $c_credit_person = json_decode($query[0]['c_credit_person']);
+            if ($query[0]['c_credit_status']==2 && !empty($c_credit_person) && $c_credit_person != []){
+                $str = '';
+                foreach ($c_credit_person as $value){
+                    $str = $str.$value->name.',';
+                }
+                $query[0]['c_credit_person'] = $str;
+            }
+
+            //项目图片  
+            $query[0]['p_img'] = explode(',',$query[0]['p_img']);
+            
+            //合同图片
+            $query[0]['p_contract_img'] = explode(',',$query[0]['p_contract_img']);
+
+            return $this->renderer->render($response,'index.phtml',['result'=>$query[0]]);
+        } else {
+            $response = $response->withStatus(404)->withHeader('Content-type', 'application/json');
+            $response->getBody()->write(json_encode(
+                [
+                    'error' => empty($query)?"该项目不符合复核条件":$query,
+                ]
+            ));
+        }
+//        return $response;
+
+    } catch (Exception $e) {
+        $response = $response->withStatus(500)->withHeader('Content-type', 'application/json');
+        $response->getBody()->write(json_encode(
+            [
+                'error' => $e->getMessage(),
+            ]
+        ));
+        return $response;
     }
 });

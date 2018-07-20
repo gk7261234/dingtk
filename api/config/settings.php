@@ -60,7 +60,7 @@ return [
         'password' => 'root',
         'dbName' => 'vc265'
     ],
-    //全局变量配置
+    //全局变量配置 q系统地址
     'params' => [
         'q-api' => 'http://www.q2018.com/',
     ]

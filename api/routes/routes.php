@@ -93,7 +93,7 @@ $app->post('/dAuthUser',function (Request $req, Response $response, array $arg){
 });
 
 //钉钉审批回调  service 需传入$app实例
-$app->post('/dAuthCallBack',function (Request $req, Response $response, array $arg){
+$app->post('/ajax/dAuthCallBack',function (Request $req, Response $response, array $arg){
 
     $dBody = $req->getParsedBody();
 

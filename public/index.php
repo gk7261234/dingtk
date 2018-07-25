@@ -32,8 +32,8 @@ require __DIR__ . '/../api/components/dependencies.php';
 
 // Register routes
 require __DIR__ . '/../api/routes/routes.php';
-
 require __DIR__.'/../api/routes/project/reviewRoutes.php';
+require __DIR__.'/../api/routes/project/loanRoutes.php';
 
 // Register middleware
 require __DIR__ . '/../api/components/middleware.php';

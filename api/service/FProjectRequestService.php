@@ -18,7 +18,7 @@ class FProjectRequestService {
         file_put_contents($file, "[".$time."] [内部打印]:"." dataType ".$dataType." ".$str."\n", FILE_APPEND);
     }
 
-    public function audit($id) {
+    public function audit($id,$process_code) {
         $db = $this->app->db;
         $db->begin();
         try {
@@ -58,12 +58,19 @@ class FProjectRequestService {
             $req['status'] = 10;
             //添加原始项目  返回该条目的id
             $f_id = $db->insert('f_projects',$req);
-            $this->logInfo($f_id);
             if ($f_id === false){
                 $db->rollback();
                 return false;
             }
 
+            $this->logInfo("zhunbei f_project_id更新通过");
+            $s = $db->update('fproj_audit',['f_project_id'=>$f_id],["process_code"=>$process_code]);
+            if (!$s){
+                $this->logInfo("关联表f_project_id更新失败");
+                $db->rollback();
+                return false;
+            }
+            $this->logInfo("关联表f_project_id更新通过");
             //复核后添加 f_project_id
             $p = $db->update('fproj_requests',['f_project_id'=>$f_id],["id"=>$id]);
             if(!$p){
@@ -129,7 +136,6 @@ class FProjectRequestService {
             }
 
             $db->commit();
-            $this->logInfo("end");
             return $f_id;
 
         }catch(PDOException $e){
@@ -139,11 +145,11 @@ class FProjectRequestService {
         }
     }
 
-    public function rollBack($id,$processInstanceId,$staffId,$remark){
+    public function rollBack($id,$staffId,$remark){
         $db = $this->app->db;
         $db->begin();
         try{
-            $r = $db->update('fproj_requests',['status'=>2,'updated_at'=>date("Y-m-d H:i:s"),'auditor_id'=>19 ],["process_code"=>$processInstanceId]);
+            $r = $db->update('fproj_requests',['status'=>2,'updated_at'=>date("Y-m-d H:i:s"),'auditor_id'=>19 ],["id"=>$id]);
             $this->app->logger->info($r);
             $l = $db->insert('fproj_requests_logs',[
                 'req_id'=>$id,
@@ -168,11 +174,12 @@ class FProjectRequestService {
 
     }
 
-    public function review($id,$processInstanceId,$staffId,$remark){
+    public function review($id,$staffId,$remark){
+        $this->logInfo("review");
         $db = $this->app->db;
         $db->begin();
         try{
-            $r = $db->update('fproj_requests',['status'=>4,'updated_at'=>date("Y-m-d H:i:s"),'auditor_id'=>19 ],["process_code"=>$processInstanceId]);
+            $r = $db->update('fproj_requests',['status'=>4,'updated_at'=>date("Y-m-d H:i:s"),'auditor_id'=>19 ],["id"=>$id]);
             if (!$r){
                 $this->app->mailer->send(['1011464909@qq.com'=>'kuhn'],'钉钉项目审核 复核','项目更新状态失败');
             }

@@ -6,17 +6,8 @@ class ProjectService{
     {
         $this->app = $app;
     }
-
-    private function logInfo ($str) {
-        $dataType = gettype($str);
-        if($dataType=='array'){
-            $str = json_encode($str);
-        }
-        $file  = __DIR__ . '\..\..\logs\app.log';
-        $time = (string)date("Y-m-d H:i:s");
-        file_put_contents($file, "[".$time."] [内部打印]:"." dataType ".$dataType." ".$str."\n", FILE_APPEND);
-    }
-    public function release($id,$f_id){
+    
+    public function release($id,$f_id,$process_code){
         $db = $this->app->db;
         $db->begin();
         try{
@@ -47,11 +38,15 @@ class ProjectService{
                 "p_debtor_person"=>$fr_project['p_debtor_person']
             ];
             $p_id = $db->insert('projects',$data);
-            $this->logInfo("下面是项目id");
-            $this->logInfo($p_id);
             if($p_id>0){
-                $db->commit();
-                return $p_id;
+                $s = $db->update('fproj_audit',['project_id'=>$p_id],["process_code"=>$process_code]);
+                if ($s){
+                    $db->commit();
+                    return $p_id;
+                }else{
+                    $db->rollback();
+                    return false;
+                }
             }else{
                 $db->rollback();
                 return false;

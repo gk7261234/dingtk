@@ -39,12 +39,14 @@ $app->group('/project/loan',function (){
             if (empty($err)){
                 $response->getBody()->write(json_encode(
                     [
+                        'result' => 'Y',
                         'error' => ''
                     ]
                 ));
             }else{
                 $response->getBody()->write(json_encode(
                     [
+                        'result' => 'Y',
                         'error' => $err
                     ]
                 ));
@@ -53,6 +55,7 @@ $app->group('/project/loan',function (){
             $response->withStatus(500)->withHeader('Content-type', 'application/json');
             $response->getBody()->write(json_encode(
                 [
+                    'result' => 'N',
                     'error' => $e->getMessage(),
                 ]
             ));

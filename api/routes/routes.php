@@ -99,11 +99,15 @@ $app->post('/ajax/dAuthCallBack',function (Request $req, Response $response, arr
         $dBody = $req->getParsedBody();
 
         $this->logger->info($dBody);
+        $this->logger->info($this->get("ddAuditPerson")['p_audit']);
+        $this->logger->info($this->get("ddAuditPerson")['p_review']);
+
         $processInstanceId = $dBody['processInstanceId'];
 
         $ral = $this->db->queryAllValue("SELECT * FROM fproj_audit WHERE process_code = :process_code ",[":process_code"=>$processInstanceId]);
         $p_id = $ral[0]['project_id'];
         $fpro_request_id = $ral[0]['fpro_request_id'];
+        $this->logger->info($fpro_request_id);
         $result = $this->db->queryAllValue("SELECT id,status FROM fproj_requests WHERE id = :f_request_id",[":f_request_id"=>$fpro_request_id]);
 
         if( $result == [] &&  strpos($dBody['title'],"项目审批") === false  ){
@@ -115,31 +119,31 @@ $app->post('/ajax/dAuthCallBack',function (Request $req, Response $response, arr
         $status = $result[0]['status'];
         $fp_service = $this->fprService;
 
-        $this->logger->info($dBody['result']);
-
         /********************** 重构 start ***************************/
         if( $dBody['type'] == 'start' && $dBody['event'] == 'instance_change' &&  is_null($dBody['result']) ){
             //审批流程发起
             $this->logger->info("这是审批流发起");
-        }elseif ( $dBody['type'] == 'start' && $dBody['event'] == 'task_change' ){
+        }elseif ( $dBody['type'] == 'finish' && $dBody['result'] == 'agree' && $dBody['event'] == 'task_change' ){
             //中间审批人 用staffId区分审批节点 重复审批人单独处理
-            if ($dBody['staffId'] == $this->get("ddAuditPerson")['p_audit'] && $status == '1'){
+            if ($dBody['staffId'] == $this->get("ddAuditPerson")['p_audit']){
+                $this->logger->info("项目审核");
                 //节点2 项目审核 胡欣杰
                 if ( $status == '1' ){
-                    $this->logger->info("项目审核");
                     $fp_service->review($id,$dBody['staffId'],$dBody['remark']);
                 }else{
 //                    $this->mailer->send(['1011464909@qq.com'=>'kuhn'],'钉钉审核','项目状态不正确');
                 }
             }elseif ($dBody['staffId'] == $this->get("ddAuditPerson")['p_review'] && $status == '4'){
                 //节点3 项目复核 王泽惠
+                $this->logger->info("项目复核");
                 $r = $fp_service->audit($id,$processInstanceId); //return f_id or false
                 if ( $r !== false ) {
                     //生成项目 projects
                     $p_service = $this->pService;
                     $r = $p_service->release($id, $r,$processInstanceId);
+                }else{
+                    $this->logger->info("复核失败");
                 }
-                $this->logger->info("项目复核");
 //                if ( $r !== false ) {
 //                    $this->mailer->send(['1011464909@qq.com'=>'kuhn'],'钉钉审核','审核已通过');
 //                } else {
@@ -168,10 +172,10 @@ $app->post('/ajax/dAuthCallBack',function (Request $req, Response $response, arr
             if (is_null($p_id) || $p_id == ''){
                 //项目未审核通过之前被拒绝
                 $fp_service->rollBack($id,$dBody['staffId'],$dBody['remark']);
-                $this->mailer->send(['1011464909@qq.com'=>'kuhn'],'钉钉审核','审核已拒绝');
+//                $this->mailer->send(['1011464909@qq.com'=>'kuhn'],'钉钉审核','审核已拒绝');
             }else{
                 //项目已成立时被拒绝  处理方案暂未定
-                $this->logger->info("1231111");
+                $this->logger->info("项目已成立时被拒绝");
             }
         }else{
             //其他。。。。。 （如： 转交 。。。 以后再说）

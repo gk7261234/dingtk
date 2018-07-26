@@ -9,7 +9,7 @@ class db
         if (gettype($str) == 'array') {
             $str = json_encode($str);
         }
-        $file = __DIR__ . '\..\..\logs\app.log';
+        $file = __DIR__ . '/../../logs/app.log';
         $time = (string)date("Y-m-d H:i:s");
         file_put_contents($file, "[" . $time . "] [内部打印]:" . " " . $str . "\n", FILE_APPEND);
     }

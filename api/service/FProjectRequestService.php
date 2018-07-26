@@ -13,7 +13,7 @@ class FProjectRequestService {
         if($dataType=='array'){
             $str = json_encode($str);
         }
-        $file  = __DIR__ . '\..\..\logs\app.log';
+        $file  = __DIR__ . '/../../logs/app.log';
         $time = (string)date("Y-m-d H:i:s");
         file_put_contents($file, "[".$time."] [内部打印]:"." dataType ".$dataType." ".$str."\n", FILE_APPEND);
     }
@@ -63,14 +63,12 @@ class FProjectRequestService {
                 return false;
             }
 
-            $this->logInfo("zhunbei f_project_id更新通过");
             $s = $db->update('fproj_audit',['f_project_id'=>$f_id],["process_code"=>$process_code]);
             if (!$s){
-                $this->logInfo("关联表f_project_id更新失败");
                 $db->rollback();
                 return false;
             }
-            $this->logInfo("关联表f_project_id更新通过");
+
             //复核后添加 f_project_id
             $p = $db->update('fproj_requests',['f_project_id'=>$f_id],["id"=>$id]);
             if(!$p){
@@ -82,6 +80,10 @@ class FProjectRequestService {
             $req['f_project_id'] = $f_id;
             $req['name'] = $req['user_name'];
             $req['login_name'] = $login_name;
+            $req['p_business_financial_situation'] = $req['p_funding_operation'];
+            $req['p_funding_operation'] = $req['p_fnc_use'];
+            $req['p_introduction'] = $req['p_project_introduction'];
+
             //拆分到others表中
             $o = $db->insert('project_other_info',$req);
             if ($o === false){
@@ -95,8 +97,8 @@ class FProjectRequestService {
                 if ($pArr){
                     foreach ($pArr as $img){
                         $p_img = $db->insert('f_project_contract_imgs',['f_project_id'=>(int)$f_id,'img'=>$img,'img_type'=>1]);
-                        if ($p_img>0){
-                            $response = $client->request('post','http://www.q2018.com/projects/fproject/fprojrequest/project_img_handle',[
+                        if ((int)$p_img>0){
+                            $response = $client->request('post',$this->app->get('params')["q-api"].'/projects/fproject/fprojrequest/project_img_handle',[
                                 'form_params' => [
                                     'f_id' => $f_id,
                                     'img' => $img,
@@ -117,8 +119,8 @@ class FProjectRequestService {
                     foreach ($contractArr as $cimg){
                         $fr_id = $req['id'];
                         $p_img = $db->insert('f_project_contract_imgs',['f_project_id'=>$f_id,'img'=>$fr_id."/".$cimg,'img_type'=>2]);
-                        if ($p_img>0){
-                            $response = $client->request('post','http://www.q2018.com/projects/fproject/fprojrequest/contract_img_handle',[
+                        if ((int)$p_img>0){
+                            $response = $client->request('post',$this->app->get('params')["q-api"].'/projects/fproject/fprojrequest/contract_img_handle',[
                                 'form_params' => [
                                     'fr_id' => $fr_id,
                                     'img' => $cimg,
@@ -175,7 +177,6 @@ class FProjectRequestService {
     }
 
     public function review($id,$staffId,$remark){
-        $this->logInfo("review");
         $db = $this->app->db;
         $db->begin();
         try{

@@ -162,6 +162,7 @@ $app->post('/ajax/dAuthCallBack',function (Request $req, Response $response, arr
 
             //获取请求结果
             $body = $response->getBody();
+
             if ($body->result == 'Y'){
                 $this->logger->info("放款成功");
             }else{
@@ -245,23 +246,10 @@ $app->get('/ajax/ddAuth/{id}/details',function (Request $req, Response $response
 
             return $this->renderer->render($response,'index.phtml',['result'=>$query[0]]);
         } else {
-            $response = $response->withStatus(404)->withHeader('Content-type', 'application/json');
-            $response->getBody()->write(json_encode(
-                [
-                    'error' => empty($query)?"该项目不符合复核条件":$query,
-                ]
-            ));
+            return $this->renderer->render($response,'index.phtml',['result'=>[]]);
         }
-//        return $response;
-
     } catch (Exception $e) {
         $this->logger->info($e->getMessage());
-        $response = $response->withStatus(500)->withHeader('Content-type', 'application/json');
-        $response->getBody()->write(json_encode(
-            [
-                'error' => $e->getMessage(),
-            ]
-        ));
-        return $response;
+        return $this->renderer->render($response,'index.phtml',['result'=>[]]);
     }
 });

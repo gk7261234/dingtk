@@ -99,18 +99,15 @@ $app->post('/ajax/dAuthCallBack',function (Request $req, Response $response, arr
         $dBody = $req->getParsedBody();
 
         $this->logger->info($dBody);
-        $this->logger->info($this->get("ddAuditPerson")['p_audit']);
-        $this->logger->info($this->get("ddAuditPerson")['p_review']);
 
         $processInstanceId = $dBody['processInstanceId'];
 
-        $ral = $this->db->queryAllValue("SELECT * FROM fproj_audit WHERE process_code = :process_code ",[":process_code"=>$processInstanceId]);
+        $ral = $this->db->queryAllValue("SELECT * FROM fproj_audit WHERE process_code = :process_code OR loan_code = :process_code",[":process_code"=>$processInstanceId]);
         $p_id = $ral[0]['project_id'];
         $fpro_request_id = $ral[0]['fpro_request_id'];
-        $this->logger->info($fpro_request_id);
         $result = $this->db->queryAllValue("SELECT id,status FROM fproj_requests WHERE id = :f_request_id",[":f_request_id"=>$fpro_request_id]);
 
-        if( $result == [] &&  strpos($dBody['title'],"项目审批") === false  ){
+        if( $result == [] && strpos($dBody['title'],"项目审批") === false  ){
             $this->logger->info("其他审批。。。");
             return;
         }
@@ -125,14 +122,15 @@ $app->post('/ajax/dAuthCallBack',function (Request $req, Response $response, arr
             $this->logger->info("这是审批流发起");
         }elseif ( $dBody['type'] == 'finish' && $dBody['result'] == 'agree' && $dBody['event'] == 'task_change' ){
             //中间审批人 用staffId区分审批节点 重复审批人单独处理
-            if ($dBody['staffId'] == $this->get("ddAuditPerson")['p_audit']){
+            if ($dBody['staffId'] == $this->get("ddAuditPerson")['p_audit'] && $status == '1'){
                 $this->logger->info("项目审核");
                 //节点2 项目审核 胡欣杰
-                if ( $status == '1' ){
-                    $fp_service->review($id,$dBody['staffId'],$dBody['remark']);
-                }else{
-//                    $this->mailer->send(['1011464909@qq.com'=>'kuhn'],'钉钉审核','项目状态不正确');
+                $s = $fp_service->review($id,$dBody['staffId'],$dBody['remark']);
+                //讲道理如果处理失败应该，通知审核人
+                if ($s == false){
+                    $this->mailer->send(['1011464909@qq.com' => 'kuhn'], '钉钉审核', '审核失败，项目处理中出错，请及时人工干预，终止流程继续，待问题修复后恢复，以免造成不必要的麻烦');
                 }
+
             }elseif ($dBody['staffId'] == $this->get("ddAuditPerson")['p_review'] && $status == '4'){
                 //节点3 项目复核 王泽惠
                 $this->logger->info("项目复核");
@@ -141,14 +139,13 @@ $app->post('/ajax/dAuthCallBack',function (Request $req, Response $response, arr
                     //生成项目 projects
                     $p_service = $this->pService;
                     $r = $p_service->release($id, $r,$processInstanceId);
+                    if ($r == false) {
+                        $this->mailer->send(['1011464909@qq.com' => 'kuhn'], '钉钉复核', '复核失败，项目处理中出错，请及时人工干预，终止流程继续，待问题修复后恢复，以免造成不必要的麻烦');
+                    }
                 }else{
                     $this->logger->info("复核失败");
+                    $this->mailer->send(['1011464909@qq.com' => 'kuhn'], '钉钉复核', '复核失败，处理项目时出错，请及时人工干预，终止流程继续，待问题修复后恢复，以免造成不必要的麻烦');
                 }
-//                if ( $r !== false ) {
-//                    $this->mailer->send(['1011464909@qq.com'=>'kuhn'],'钉钉审核','审核已通过');
-//                } else {
-//                    $this->mailer->send(['1011464909@qq.com'=>'kuhn'],'钉钉审核','审核失败，项目处理中出错，请及时人工干预');
-//                }
             }
         }elseif ( $dBody['type'] == 'finish' && $dBody['event'] == 'instance_change' && $dBody['result'] == "agree" ){
             //审批结束 放款审核 注意观察放款结果
@@ -167,6 +164,7 @@ $app->post('/ajax/dAuthCallBack',function (Request $req, Response $response, arr
                 $this->logger->info("放款成功");
             }else{
                 $this->logger->info("放款放款失败");
+                $this->mailer->send(['1011464909@qq.com' => 'kuhn'], '钉钉放款审核', '放款审核失败，q系统api处理失败，请及时人工干预，终止流程继续，待问题修复后恢复，以免造成不必要的麻烦');
             }
         }elseif ($dBody['type'] == 'finish' && $dBody['event'] == 'instance_change' && $dBody['result'] == "refuse"){
             //审批拒绝 要判断项目成立前还是成立后
@@ -177,10 +175,27 @@ $app->post('/ajax/dAuthCallBack',function (Request $req, Response $response, arr
             }else{
                 //项目已成立时被拒绝  处理方案暂未定
                 $this->logger->info("项目已成立时被拒绝");
+                $client = new Client();
+                $response = $client->request('post',$this->get('params')["q-api"].'/projects/fproject/fprojrequest/loan',[
+                    'form_params' => [
+                        'processInstanceId' => $processInstanceId,
+                        'type'=>'loan'
+                    ]
+                ]);
+
+                //获取请求结果
+                $body = $response->getBody();
+                $this->logger->info($body);
+                $this->logger->info($response);
             }
         }else{
             //其他。。。。。 （如： 转交 。。。 以后再说）
             $this->logger->info("其他状况（是允许出现的）");
+        }
+
+        //记录审批备注
+        if ($dBody['remark'] && $dBody['remark'] != ''){
+            $this->ddLog->log($dBody['staffId'],$processInstanceId,$dBody['result'],$dBody['remark']);
         }
 
     }catch (Exception $e){
@@ -251,5 +266,24 @@ $app->get('/ajax/ddAuth/{id}/details',function (Request $req, Response $response
     } catch (Exception $e) {
         $this->logger->info($e->getMessage());
         return $this->renderer->render($response,'index.phtml',['result'=>[]]);
+    }
+});
+
+//钉钉 -- 备注信息
+$app->get('/ajax/ddAuth/{code}/remark',function (Request $req, Response $response, array $args){
+    $query = $this->db->queryAllValue("SELECT * FROM dd_log where process_code = :process_code", [":process_code" => $args['code']]);
+    $this->logger->info($query);
+    if (gettype($query) == 'array'&&!empty($query)){
+        for ($i=0;count($query)>$i;$i++){
+            if (isset($this->get('allHands')[$query[$i]['staff_id']])){
+                $query[$i]['name'] = $this->get('allHands')[$query[$i]['staff_id']];
+            }else{
+                $query[$i]['name'] = 'null';
+            }
+        }
+        $this->logger->info($query);
+        return $this->renderer->render($response,'remark.phtml',['results'=>$query]);
+    }else{
+        return $this->renderer->render($response,'remark.phtml',['results'=>[]]);
     }
 });

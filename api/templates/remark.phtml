@@ -7,8 +7,16 @@
     <title>放款审核-备注信息</title>
 </head>
 <body>
-<?php foreach ($results as $result) {?>
-    <div>我执行了几次</div>
+<?php if ($results == []){ ?>
+<div>信息有误</div>
+<?php }else{?>
+    <?php foreach ($results as $result) {?>
+        <div>操作员：<?= $result['name'] ?></div>
+        <div>操作结果：<?= $result['result'] ?></div>
+        <div>备注信息：<?= $result['remark'] ?></div>
+        <br>
+    <?php }?>
 <?php }?>
+
 </body>
 </html>

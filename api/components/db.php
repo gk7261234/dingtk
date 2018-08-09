@@ -128,6 +128,7 @@ class db
             $res = $this->connect()->prepare($sql);
             $res->execute($data);
             $arr = $res->fetchAll(PDO::FETCH_ASSOC);
+            $this->logInfo($sql);
             return $arr;
         } catch (PDOException $e) {
             return $e->getMessage();

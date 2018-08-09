@@ -62,6 +62,10 @@ $container['pService'] = function ($c) {
     return new ProjectService($c);
 };
 
+$container['ddLog'] = function ($c){
+    return new DDRemarkService($c);
+};
+
 //通用的邮件服务
 $container['mailer'] = function ($c) {
     $config = $c->get('settings')['mailer']['transport'];

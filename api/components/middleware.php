@@ -8,7 +8,7 @@
 //    $res->getBody()->write('AFTER');
 //    return $response;
 //};
-
+//钉钉微应用用户识别
 $authUser = function ($req, $response, $next){
     $this->logger->info($_SESSION['userName']);
     if (isset($_SESSION['userName']) && in_array($_SESSION['userName'],$this->get('ddTalk')['permitUser'])){
@@ -23,4 +23,9 @@ $authUser = function ($req, $response, $next){
         ));
     }
     return $response;
+};
+
+//钉钉审批权限控制
+$userPower = function ($req,$res,$next){
+    
 };

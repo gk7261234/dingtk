@@ -23,6 +23,7 @@ require __DIR__ . '/../api/components/db.php';
 //service
 require __DIR__ . '/../api/service/FProjectRequestService.php';
 require __DIR__ . '/../api/service/ProjectService.php';
+require __DIR__.'/../api/service/DDRemarkService.php';
 
 //mailer
 require __DIR__ .'/../api/components/mailer.php';

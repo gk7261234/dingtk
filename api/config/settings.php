@@ -21,57 +21,39 @@ return [
         //mailer
         'mailer' => [
             'transport' => [
-                'host' => 'smtp.vc265.com',
-                'username' => 'guokui@vc265.com',
-                'password' => '!234qwer',
+                'host' => 'xxx',
+                'username' => 'xxxx',
+                'password' => 'xxx',
                 'port' => '25',
-                'from' => ['guokui@vc265.com'=>'vc265'],
+                'from' => ['xxx'=>'vc265'],
             ]
         ] ,
     ],
     //钉钉微应用 项目审核配置
     'ddTalk'=>[
-        'agentId' => '171995680',
-        'corpid' => 'ding2c238b123d0f70fe',
-        'corpsecret' => 'WSglHDjrPbTAaEEImMNOZnLYsMTFTqhFHGtOjNp7Rkj2igv5plK51OJ1mW2DfXul',
+        'agentId' => 'xx',
+        'corpid' => 'xxx',
+        'corpsecret' => 'xxx',
         'singnatureUrl' => 'http://192.168.1.56:8080/',
-        'singnatureNoncestr' => 'jR93Gk5jc0mFgf76',
+        'singnatureNoncestr' => 'xxx',
         'token_url' => 'https://oapi.dingtalk.com/gettoken',
         'ticket_url' => 'https://oapi.dingtalk.com/get_jsapi_ticket',
         'user_info_url' => 'https://oapi.dingtalk.com/user/getuserinfo',
         'permitUser' => [
-            "郑熹",
-            "郑达希",
-            "王泽惠",
-            "郭奎",
-            "冯武泰"
+            "郑x熹",
+            "郑达x",
+            "王x惠",
+            "郭x奎",
+            "冯x泰"
         ]
     ],
     //staff_id => name
     'allHands' => [
-        "183312123030024660"=>"盛忠宙",
-        "03343537539687"=>"李秀清",
-        "144106636032582990"=>"胡欣杰",
-        "03331152285524"=>"王泽惠",
-        "0254286853943706"=>"王梅",
-        "143861100126211227"=>"是蔚瑩",
-        "103731640824053036"=>"张佳伟",
-        "03344943296605"=>"郭奎",
-        "04344536073039"=>"彭修文",
-        "03332210379315"=>"陈飞",
-        "03332559406412"=>"郑熹",
-        "066228400823629605"=>"孙超英",
+
     ],
     //钉钉审批流 审批参与人
     'ddAuditPerson' => [
-        "p_create" => "183312123030024660",  //项目发起人： 盛忠宙 183312123030024660  节点1
-        "operate1" => "03343537539687", //审核校验： 李秀清  03343537539687
-        "p_audit" => "03344943296605",   //项目审核： 胡欣杰  144106636032582990  节点2
-        "p_review" => "04344536073039",  //项目复核： 王泽惠  03331152285524  节点3
-        "operate2" => "0254286853943706",  //上架提醒： 王梅  0254286853943706
-        "operate3" => "143861100126211227",  //上架提醒： 是蔚瑩  143861100126211227
-        "operate4" => "103731640824053036",  //提醒确认服务费： 张佳伟 103731640824053036
-        "p_loan" => "03332559406412",  //放款审核： 王泽惠  03331152285524  节点4
+
     ],
     //数据库配置
     'dbSetting' => [
